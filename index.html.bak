@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather App</title>
+  <style>
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      background: linear-gradient(to bottom, #87ceeb, #1e90ff);
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    #search-form {
+      margin-bottom: 20px;
+    }
+    #search-form input {
+      padding: 10px;
+      font-size: 16px;
+      width: 280px;
+      border: none;
+      border-radius: 8px;
+      outline: none;
+    }
+    #search-form button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 8px;
+      background-color: #f0f8ff;
+      color: #1e90ff;
+      font-weight: bold;
+      margin-left: 10px;
+    }
+    #search-form button:hover {
+      background-color: #1e90ff;
+      color: #fff;
+    }
+    #weather {
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 12px;
+      background-color: rgba(255, 255, 255, 0.8);
+      color: #333;
+      width: 80%;
+      max-width: 400px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .temp {
+      font-size: 3em;
+      font-weight: bold;
+    }
+    .desc {
+      font-style: italic;
+      margin: 10px 0;
+    }
+    .details {
+      margin-top: 10px;
+      font-size: 1em;
+    }
+    .icon {
+      width: 100px;
+      height: auto;
+      margin: 10px 0;
+    }
+    footer {
+      margin-top: 30px;
+      font-size: 0.9em;
+      color: #e0f7fa;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌦 Live Weather Search</h1>
+  <form id="search-form">
+    <input type="text" id="city-input" placeholder="Enter city name" required>
+    <button type="submit">Get Weather</button>
+  </form>
+  <div id="weather">
+    <p>Enter a city name to see the weather!</p>
+  </div>
+  <footer>
+    <p>Weather data provided by OpenWeatherMap</p>
+  </footer>
+  <script>
+    const API_KEY = "cd3fbefa15bb234b439e406ac671ad55";
+
+    // Fetch weather data
+    async function getWeather(city) {
+      const URL = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+      try {
+        const response = await fetch(URL);
+        if (!response.ok) {
+          throw new Error(`City not found. Please try again.`);
+        }
+        const data = await response.json();
+        displayWeather(data);
+      } catch (error) {
+        document.getElementById('weather').innerHTML = `<p>Error: ${error.message}</p>`;
+      }
+    }
+
+    // Display weather data
+    function displayWeather(data) {
+      const weatherDiv = document.getElementById('weather');
+      const temp = Math.round(data.main.temp); // Round temperature
+      const description = data.weather[0].description;
+      const humidity = data.main.humidity;
+      const windSpeed = data.wind.speed;
+
+      let weatherIcon = "";
+    if (description.includes("clear sky")) {
+		weatherIcon = "Clear sky.png"; // Add your clear sky image
+		} else if (description.includes("sun")) {
+		weatherIcon = "sun.png"; // Local sun image
+		} else if (description.includes("cloud")) {
+		weatherIcon = "https://cdn-icons-png.flaticon.com/512/414/414927.png"; // Cloud icon
+		} else if (description.includes("thunderstorm")) {
+		weatherIcon = "https://cdn-icons-png.flaticon.com/512/3036/3036881.png"; // Thunderstorm icon
+		} else if (description.includes("fog")) {
+		weatherIcon = "https://cdn-icons-png.flaticon.com/512/114/114427.png"; // Fog icon
+		} else if (description.includes("rain")) {
+		weatherIcon = "https://cdn-icons-png.flaticon.com/512/414/414928.png"; // Heavy rain icon
+		} else if (description.includes("snow")) {
+		weatherIcon = "https://cdn-icons-png.flaticon.com/512/726/726674.png"; // Snow icon
+  }
+
+      weatherDiv.innerHTML = `
+        <img src="${weatherIcon}" alt="Weather icon" class="icon">
+        <p class="temp">${temp}°C</p>
+        <p class="desc">${description.charAt(0).toUpperCase() + description.slice(1)}</p>
+        <div class="details">
+          <p>Humidity: ${humidity}%</p>
+          <img src="https://cdn-icons-png.flaticon.com/512/728/728093.png" alt="Humidity icon" class="icon">
+          <p>Wind Speed: ${windSpeed} m/s</p>
+          <img src="Wind.png" alt="Wind icon" class="icon">
+        </div>
+      `;
+    }
+
+    // Handle form submission
+    document.getElementById('search-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      const city = document.getElementById('city-input').value.trim();
+      if (city) {
+        getWeather(city);
+      }
+    });
+  </script>
+</body>
+</html>
